@@ -96,11 +96,19 @@ class PAGViewState extends State<PAGView> {
   Widget build(BuildContext context) {
     Widget child = const SizedBox();
     if (_isInitialized) {
-      child = Texture(textureId: _textureId);
+      child = FittedBox(
+        fit: BoxFit.cover,
+        clipBehavior: Clip.hardEdge,
+        child: SizedBox(
+          width: _width / 2,
+          height: _height / 2,
+          child: Texture(textureId: _textureId),
+        ),
+      );
     }
     return SizedBox(
-      width: widget.width ?? _width / 2,
-      height: widget.height ?? _height / 2,
+      width: widget.width,
+      height: widget.height,
       child: child,
     );
   }
