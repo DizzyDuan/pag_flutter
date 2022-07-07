@@ -16,7 +16,7 @@ typedef void(^PlayerStatusCallback)(NSString *status);
 /**
   Pag纹理渲染类
   */
-@interface TGFlutterPagRender : UIView <FlutterTexture>
+@interface FlutterPagRender : UIView <FlutterTexture>
 
 //当前pag的size
  @property(nonatomic, readonly) CGSize size;

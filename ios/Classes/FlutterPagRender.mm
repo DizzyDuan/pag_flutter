@@ -5,7 +5,7 @@
 //  Created by zhaodeyu on 2022/7/6.
 //
 
-#import "TGFlutterPagRender.h"
+#import "FlutterPagRender.h"
 #import <OpenGLES/EAGL.h>
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
@@ -15,7 +15,7 @@
 #include <chrono>
 #include <mutex>
 
-@interface TGFlutterPagRender()
+@interface FlutterPagRender()
 
 @property(nonatomic, strong) PAGSurface *surface;
 
@@ -35,7 +35,7 @@ static int64_t GetCurrentTimeUS() {
  }
 
 
-@implementation TGFlutterPagRender
+@implementation FlutterPagRender
 {
      FrameUpdateCallback _callback;
     PlayerStatusCallback _playerCallback;
@@ -149,11 +149,10 @@ static int64_t GetCurrentTimeUS() {
 - (void)releaseRender{
     [self stopRender];
     _callback = nil;
+    _playerCallback = nil;
     _surface = nil;
     self.player = nil;
 }
-
-
 
 
 @end

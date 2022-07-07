@@ -1,6 +1,6 @@
 #import "PagFlutterPlugin.h"
-#import "TGFlutterPagRender.h"
-#import "PagPlayerViewFactory.h"
+#import "FlutterPagRender.h"
+
 /**
   FlutterPagPlugin，处理flutter MethodChannel约定的方法
   */
@@ -31,9 +31,7 @@
   instance.registrar = registrar;
   instance.channel = channel;
   [registrar addMethodCallDelegate:instance channel:channel];
-    
-[registrar registerViewFactory:[[PagPlayerViewFactory alloc]init] withId:@"pag_flutter"];
-    
+        
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -60,7 +58,7 @@
          result(@{});
          return;
      }
-     TGFlutterPagRender *render = [_renderMap objectForKey:textureId];
+    FlutterPagRender *render = [_renderMap objectForKey:textureId];
      [render releaseRender];
      [_renderMap removeObjectForKey:textureId];
      result(@{});
@@ -72,7 +70,7 @@
          result(@{});
          return;
      }
-     TGFlutterPagRender *render = [_renderMap objectForKey:textureId];
+    FlutterPagRender *render = [_renderMap objectForKey:textureId];
      [render stopRender];
      result(@{});
 }
@@ -83,7 +81,7 @@
          result(@{});
          return;
      }
-     TGFlutterPagRender *render = [_renderMap objectForKey:textureId];
+    FlutterPagRender *render = [_renderMap objectForKey:textureId];
      [render startRender];
      result(@{});
  }
@@ -97,9 +95,9 @@
      double initProgress = 0.0;
      int repeatCount = 1;
      BOOL autoPlay = YES;
-
-
+    
      NSString* assetName = arguments[@"assetName"];
+
      NSData *pagData = nil;
      if ([assetName isKindOfClass:NSString.class] && assetName.length > 0) {
          if (!pagData) {
@@ -110,6 +108,13 @@
 
          }
          [self pagRenderWithPagData:pagData progress:initProgress repeatCount:repeatCount autoPlay:autoPlay result:result];
+     }else{
+         if (!pagData) {
+            
+             NSString *filePath = arguments[@"filePath"];
+             pagData = [NSData dataWithContentsOfFile:filePath];
+         }
+         [self pagRenderWithPagData:pagData progress:initProgress repeatCount:repeatCount autoPlay:autoPlay result:result];
      }
     
      
@@ -118,7 +123,7 @@
 - (void)pagRenderWithPagData:(NSData *)pagData progress:(double)progress repeatCount:(int)repeatCount autoPlay:(BOOL)autoPlay result:(FlutterResult)result{
      __block int64_t textureId = -1;
 
-     TGFlutterPagRender *render = [[TGFlutterPagRender alloc] initWithPagData:pagData progress:progress autoPlay:autoPlay frameUpdateCallback:^{
+    FlutterPagRender *render = [[FlutterPagRender alloc] initWithPagData:pagData progress:progress autoPlay:autoPlay frameUpdateCallback:^{
          
           [self.textures textureFrameAvailable:textureId];
      } playerStatusCallback:^(NSString * _Nonnull status) {
