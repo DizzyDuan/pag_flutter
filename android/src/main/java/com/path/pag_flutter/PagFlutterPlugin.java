@@ -74,7 +74,7 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
             String assetPath = flutterAssets.getAssetFilePathByName(assetName);
             pagFile = PAGFile.Load(context.getAssets(), assetPath);
         } else if (!TextUtils.isEmpty(filePath)) {
-            pagFile = PAGFile.Load(context.getAssets(), filePath);
+            pagFile = PAGFile.Load(filePath);
         }
         if (pagFile == null) return;
         TextureRegistry.SurfaceTextureEntry entry = textureRegistry.createSurfaceTexture();
