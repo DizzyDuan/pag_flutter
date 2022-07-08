@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
 import android.util.ArrayMap;
+import android.util.Log;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
@@ -88,12 +89,16 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
         pagView.addAnimatorListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
-                channel.invokeMethod("onStart", null);
+                Map<String, Object> map = new ArrayMap<>();
+                map.put("textureId", entry.id());
+                channel.invokeMethod("onStart", map);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
-                channel.invokeMethod("onEnd", null);
+                Map<String, Object> map = new ArrayMap<>();
+                map.put("textureId", entry.id());
+                channel.invokeMethod("onEnd", map);
             }
         });
         pagView.setReleaseListener(() -> {

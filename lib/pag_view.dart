@@ -43,13 +43,16 @@ class PAGViewState extends State<PAGView> {
   void initState() {
     super.initState();
     PagPlugin.getChannel().setMethodCallHandler((call) async {
-      switch (call.method) {
-        case "onStart":
-          if (widget.onStart != null) widget.onStart!();
-          break;
-        case "onEnd":
-          if (widget.onEnd != null) widget.onEnd!();
-          break;
+      Map map = call.arguments;
+      if (map["textureId"] == _textureId) {
+        switch (call.method) {
+          case "onStart":
+            if (widget.onStart != null) widget.onStart!();
+            break;
+          case "onEnd":
+            if (widget.onEnd != null) widget.onEnd!();
+            break;
+        }
       }
     });
     _init();
