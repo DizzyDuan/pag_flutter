@@ -22,6 +22,7 @@ import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.common.BasicMessageChannel;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -33,15 +34,18 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
     private final Map<String, PagFlutterView> pagViewMap = new ArrayMap<>();
 
     private Context context;
-    private MethodChannel channel;
+    private BinaryMessenger messenger;
+    private MethodChannel basicChannel;
     private FlutterAssets flutterAssets;
     private TextureRegistry textureRegistry;
+    private MethodChannel controlChannel;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         context = flutterPluginBinding.getApplicationContext();
-        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "pag_flutter");
-        channel.setMethodCallHandler(this);
+        messenger = flutterPluginBinding.getBinaryMessenger();
+        basicChannel = new MethodChannel(messenger, "pag_flutter");
+        basicChannel.setMethodCallHandler(this);
         flutterAssets = flutterPluginBinding.getFlutterAssets();
         textureRegistry = flutterPluginBinding.getTextureRegistry();
     }
@@ -91,14 +95,18 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
             public void onAnimationStart(Animator animation) {
                 Map<String, Object> map = new ArrayMap<>();
                 map.put("textureId", entry.id());
-                channel.invokeMethod("onStart", map);
+                if (controlChannel != null) {
+                    controlChannel.invokeMethod("onStart", map);
+                }
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 Map<String, Object> map = new ArrayMap<>();
                 map.put("textureId", entry.id());
-                channel.invokeMethod("onEnd", map);
+                if (controlChannel != null) {
+                    controlChannel.invokeMethod("onEnd", map);
+                }
             }
         });
         pagView.setReleaseListener(() -> {
@@ -108,6 +116,8 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
         });
         pagViewMap.put(String.valueOf(entry.id()), pagView);
         pagView.play();
+        controlChannel = new MethodChannel(messenger, "pag_flutter/" + entry.id());
+        controlChannel.setMethodCallHandler(this);
         Map<String, Object> map = new ArrayMap<>();
         map.put("textureId", entry.id());
         map.put("width", (double) pagFile.width());
@@ -154,7 +164,8 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
             pagPlayer.release();
         }
         pagViewMap.clear();
-        channel.setMethodCallHandler(null);
+        basicChannel.setMethodCallHandler(null);
+        controlChannel.setMethodCallHandler(null);
     }
 
 }
