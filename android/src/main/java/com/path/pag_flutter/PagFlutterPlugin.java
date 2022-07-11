@@ -45,9 +45,6 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
             case "init":
                 init(call, result);
                 break;
-            case "listener":
-                listener(call, result);
-                break;
             case "play":
                 play(call, result);
                 break;
@@ -82,6 +79,21 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
         PagFlutterView pagView = new PagFlutterView();
         pagView.setComposition(pagFile);
         pagView.setSurface(pagSurface);
+        pagView.addAnimatorListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationStart(Animator animation) {
+                Map<String, Object> map = new ArrayMap<>();
+                map.put("textureId", entry.id());
+                channel.invokeMethod("onStart", map);
+            }
+
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                Map<String, Object> map = new ArrayMap<>();
+                map.put("textureId", entry.id());
+                channel.invokeMethod("onEnd", map);
+            }
+        });
         pagView.setReleaseListener(() -> {
             entry.release();
             surface.release();
@@ -94,23 +106,6 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
         map.put("width", (double) pagFile.width());
         map.put("height", (double) pagFile.height());
         result.success(map);
-    }
-
-    private void listener(MethodCall call, Result result) {
-        PagFlutterView pagView = getPagFlutterView(call);
-        if (pagView != null) {
-            pagView.addAnimatorListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(Animator animation) {
-                    result.success("onStart");
-                }
-
-                @Override
-                public void onAnimationEnd(Animator animation) {
-                    result.success("onEnd");
-                }
-            });
-        }
     }
 
     private void play(MethodCall call, Result result) {
