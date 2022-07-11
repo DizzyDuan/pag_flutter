@@ -3,17 +3,12 @@ package com.path.pag_flutter;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.ArrayMap;
-import android.util.Log;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import org.libpag.PAGFile;
 import org.libpag.PAGSurface;
@@ -21,31 +16,25 @@ import org.libpag.PAGSurface;
 import java.util.Map;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
-import io.flutter.plugin.common.BasicMessageChannel;
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.StandardMessageCodec;
 import io.flutter.view.TextureRegistry;
 
 public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
     private final Map<String, PagFlutterView> pagViewMap = new ArrayMap<>();
 
     private Context context;
-    private BinaryMessenger messenger;
-    private MethodChannel basicChannel;
+    private MethodChannel channel;
     private FlutterAssets flutterAssets;
     private TextureRegistry textureRegistry;
-    private MethodChannel controlChannel;
 
     @Override
     public void onAttachedToEngine(@NonNull FlutterPluginBinding flutterPluginBinding) {
         context = flutterPluginBinding.getApplicationContext();
-        messenger = flutterPluginBinding.getBinaryMessenger();
-        basicChannel = new MethodChannel(messenger, "pag_flutter");
-        basicChannel.setMethodCallHandler(this);
+        channel = new MethodChannel(flutterPluginBinding.getBinaryMessenger(), "pag_flutter");
+        channel.setMethodCallHandler(this);
         flutterAssets = flutterPluginBinding.getFlutterAssets();
         textureRegistry = flutterPluginBinding.getTextureRegistry();
     }
@@ -95,18 +84,14 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
             public void onAnimationStart(Animator animation) {
                 Map<String, Object> map = new ArrayMap<>();
                 map.put("textureId", entry.id());
-                if (controlChannel != null) {
-                    controlChannel.invokeMethod("onStart", map);
-                }
+                channel.invokeMethod("onStart", map);
             }
 
             @Override
             public void onAnimationEnd(Animator animation) {
                 Map<String, Object> map = new ArrayMap<>();
                 map.put("textureId", entry.id());
-                if (controlChannel != null) {
-                    controlChannel.invokeMethod("onEnd", map);
-                }
+                channel.invokeMethod("onEnd", map);
             }
         });
         pagView.setReleaseListener(() -> {
@@ -116,8 +101,6 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
         });
         pagViewMap.put(String.valueOf(entry.id()), pagView);
         pagView.play();
-        controlChannel = new MethodChannel(messenger, "pag_flutter/" + entry.id());
-        controlChannel.setMethodCallHandler(this);
         Map<String, Object> map = new ArrayMap<>();
         map.put("textureId", entry.id());
         map.put("width", (double) pagFile.width());
@@ -164,8 +147,7 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
             pagPlayer.release();
         }
         pagViewMap.clear();
-        basicChannel.setMethodCallHandler(null);
-        controlChannel.setMethodCallHandler(null);
+        channel.setMethodCallHandler(null);
     }
 
 }
