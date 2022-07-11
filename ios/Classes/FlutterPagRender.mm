@@ -143,7 +143,7 @@ static int64_t GetCurrentTimeUS() {
     
     if (value == 1.0) {
         _playerCallback(@"onEnd");
-        [self stopRender];
+        [self pauseRender];
     }
 }
 - (void)releaseRender{
