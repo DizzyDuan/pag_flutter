@@ -42,7 +42,18 @@ class PAGViewState extends State<PAGView> {
   @override
   void initState() {
     super.initState();
-    PagPlugin.getChannel().setMethodCallHandler((call) async {
+    _init();
+  }
+
+  void _init() async {
+    Map result = await PagPlugin.getChannel().invokeMethod(
+      "init",
+      {"assetName": widget.assetName, "filePath": widget.filePath},
+    );
+    _textureId = result["textureId"];
+    _width = result["width"];
+    _height = result["height"];
+    PagPlugin.addHandler(_textureId, (call) {
       Map map = call.arguments;
       if (map["textureId"] == _textureId) {
         switch (call.method) {
@@ -55,17 +66,6 @@ class PAGViewState extends State<PAGView> {
         }
       }
     });
-    _init();
-  }
-
-  void _init() async {
-    Map result = await PagPlugin.getChannel().invokeMethod(
-      "init",
-      {"assetName": widget.assetName, "filePath": widget.filePath},
-    );
-    _textureId = result["textureId"];
-    _width = result["width"];
-    _height = result["height"];
     _isInitialized = true;
     if (mounted) {
       setState(() {});
@@ -92,6 +92,7 @@ class PAGViewState extends State<PAGView> {
       "release",
       {"textureId": _textureId},
     );
+    PagPlugin.removeHandler(_textureId);
     super.dispose();
   }
 
