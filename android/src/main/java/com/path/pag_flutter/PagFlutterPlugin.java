@@ -99,13 +99,13 @@ public class PagFlutterPlugin implements FlutterPlugin, MethodCallHandler {
             surface.release();
             pagSurface.release();
         });
-        pagViewMap.put(String.valueOf(entry.id()), pagView);
-        pagView.play();
         Map<String, Object> map = new ArrayMap<>();
         map.put("textureId", entry.id());
         map.put("width", (double) pagFile.width());
         map.put("height", (double) pagFile.height());
         result.success(map);
+        pagViewMap.put(String.valueOf(entry.id()), pagView);
+        pagView.play();
     }
 
     private void play(MethodCall call, Result result) {
