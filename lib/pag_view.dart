@@ -42,20 +42,21 @@ class PAGViewState extends State<PAGView> {
   @override
   void initState() {
     super.initState();
-    PagPlugin.getChannel().setMethodCallHandler((call) async {
-      Map map = call.arguments;
-      if (map["textureId"] == _textureId) {
-        switch (call.method) {
-          case "onStart":
-            if (widget.onStart != null) widget.onStart!();
-            break;
-          case "onEnd":
-            if (widget.onEnd != null) widget.onEnd!();
-            break;
-        }
-      }
-    });
+    // PagPlugin.getChannel().setMethodCallHandler((call) async {
+    //   Map map = call.arguments;
+    //   if (map["textureId"] == _textureId) {
+    //     switch (call.method) {
+    //       case "onStart":
+    //         if (widget.onStart != null) widget.onStart!();
+    //         break;
+    //       case "onEnd":
+    //         if (widget.onEnd != null) widget.onEnd!();
+    //         break;
+    //     }
+    //   }
+    // });
     _init();
+    _listener();
   }
 
   void _init() async {
@@ -70,6 +71,22 @@ class PAGViewState extends State<PAGView> {
     if (mounted) {
       setState(() {});
     }
+  }
+
+  void _listener() {
+    PagPlugin.getChannel().invokeMethod(
+      "listener",
+      {"textureId": _textureId},
+    ).then((value) {
+      switch (value) {
+        case "onStart":
+          if (widget.onStart != null) widget.onStart!();
+          break;
+        case "onEnd":
+          if (widget.onEnd != null) widget.onEnd!();
+          break;
+      }
+    });
   }
 
   Future play() {
