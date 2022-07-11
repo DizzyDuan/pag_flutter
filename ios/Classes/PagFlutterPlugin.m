@@ -93,7 +93,7 @@
          return;
      }
      double initProgress = 0.0;
-     int repeatCount = 1;
+     int repeatCount = 0;
      BOOL autoPlay = YES;
     
      NSString* assetName = arguments[@"assetName"];
@@ -127,7 +127,7 @@
          
           [self.textures textureFrameAvailable:textureId];
      } playerStatusCallback:^(NSString * _Nonnull status) {
-         [self.channel invokeMethod:status arguments:@{}];
+         [self.channel invokeMethod:status arguments:@{@"textureId":@(textureId)}];
      }];
      [render setRepeatCount:repeatCount];
      textureId = [self.textures registerTexture:render];
