@@ -41,8 +41,8 @@
         result([@"iOS " stringByAppendingString:[[UIDevice currentDevice] systemVersion]]);
     } else if([@"init" isEqualToString:call.method]){
         [self initPag:arguments result:result];
-    } else if([@"start" isEqualToString:call.method]){
-        [self start:arguments result:result];
+    } else if([@"play" isEqualToString:call.method]){
+        [self play:arguments result:result];
     } else if([@"stop" isEqualToString:call.method]){
         [self stop:arguments result:result];
     }  else if([@"release" isEqualToString:call.method]){
@@ -75,7 +75,7 @@
      result(@{});
 }
 
-- (void)start:(id)arguments result:(FlutterResult _Nonnull)result {
+- (void)play:(id)arguments result:(FlutterResult _Nonnull)result {
      NSNumber* textureId = arguments[@"textureId"];
      if(textureId == nil){
          result(@{});
